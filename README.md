@@ -5,6 +5,7 @@ reports acceleration, rotation, heading, and pressure/altitude over an XBee
 900 MHz radio link. A server on the demo network receives the stream and
 serves it as JSON/SSE to the train's splash page.
 
+![alt text](image.png)
 ```
  ┌─────────────── locomotive ───────────────┐                 ┌──────────── RHEL server ────────────┐
  │                                          │                 │                                     │
