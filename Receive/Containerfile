@@ -1,0 +1,10 @@
+# XBee -> HTTP/JSON bridge for the train splash page. RHEL 9.4 userspace (UBI).
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.4
+RUN microdnf install -y python3 python3-pip && microdnf clean all
+WORKDIR /app
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+COPY xbee_link.py receiver.py ./
+ENV XBEE_PORT=/dev/ttyUSB0 XBEE_BAUD=38400 HTTP_PORT=8000 WINDOW=500 AXIS_MAP=x,y,z
+EXPOSE 8000
+ENTRYPOINT ["python3", "-u", "/app/receiver.py"]

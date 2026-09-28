@@ -1,0 +1,24 @@
+# Podman Quadlet unit for the RHEL server. Install to /etc/containers/systemd/ then
+# `systemctl daemon-reload && systemctl start xbee-receiver`. Starts on boot.
+[Unit]
+Description=XBee telemetry receiver (JSON/SSE for the splash page)
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=localhost/xbee-receiver:latest
+ContainerName=xbee-receiver
+AddDevice=/dev/ttyUSB0
+Environment=XBEE_PORT=/dev/ttyUSB0
+Environment=XBEE_BAUD=38400
+Environment=HTTP_PORT=8000
+Environment=AXIS_MAP=x,y,z
+# reachable from other hosts on the demo network; use 127.0.0.1:8000:8000 to keep it local
+PublishPort=8000:8000
+
+[Service]
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

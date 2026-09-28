@@ -1,0 +1,25 @@
+# systemd unit for the Jetson host: starts the UBI container on boot and keeps it up.
+# Install: sudo cp xbee-node.service /etc/systemd/system/ && sudo systemctl enable --now xbee-node
+[Unit]
+Description=AltIMU-10 v5 telemetry node (UBI 9.4 container, XBee uplink)
+After=docker.service
+Requires=docker.service
+
+[Service]
+Restart=always
+RestartSec=3
+# clear any leftover from an unclean shutdown
+ExecStartPre=-/usr/bin/docker stop xbee-node
+ExecStartPre=-/usr/bin/docker rm xbee-node
+ExecStart=/usr/bin/docker run --rm --name xbee-node \
+    --device /dev/i2c-7:/dev/i2c-7 \
+    --device /dev/ttyUSB0:/dev/ttyUSB0 \
+    -e I2C_BUS=7 \
+    -e XBEE_PORT=/dev/ttyUSB0 \
+    -e XBEE_BAUD=38400 \
+    -e RATE_HZ=50 \
+    xbee-node:latest
+ExecStop=/usr/bin/docker stop xbee-node
+
+[Install]
+WantedBy=multi-user.target
