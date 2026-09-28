@@ -1,0 +1,20 @@
+# AltIMU-10 v5 telemetry node in a RHEL 9.4 userspace (UBI), for the Jetson Orin Nano.
+# Multi-arch base: builds natively on the Jetson (aarch64) or on x86 with --platform linux/arm64.
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.4
+ 
+RUN microdnf install -y python3 python3-pip && microdnf clean all
+ 
+WORKDIR /app
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+COPY node.py .
+ 
+# Defaults; override with -e at run time. PRINT_DIV=0 keeps the journal quiet.
+ENV I2C_BUS=7 \
+    XBEE_PORT=/dev/ttyUSB0 \
+    XBEE_BAUD=38400 \
+    RATE_HZ=50 \
+    PRINT_DIV=0
+ 
+# -u: unbuffered so log lines reach `journalctl` immediately
+ENTRYPOINT ["python3", "-u", "/app/node.py"]
